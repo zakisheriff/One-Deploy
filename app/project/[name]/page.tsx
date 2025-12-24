@@ -1,21 +1,12 @@
 /**
  * Project Detail Page - One Deploy
  * 
- * Server component wrapper that handles static generation.
- * The interactive content is delegated to a client component.
+ * Dynamic project page that handles both mock and real repositories.
  */
 
 import Link from 'next/link';
-import { mockRepositories } from '../../lib/mockData';
-import ProjectContent from './ProjectContent';
 import Navigation from '../../components/Navigation';
-
-// Generate static params for all projects (required for static export)
-export function generateStaticParams() {
-    return mockRepositories.map((repo) => ({
-        name: repo.name,
-    }));
-}
+import ProjectContent from './ProjectContent';
 
 interface PageProps {
     params: {
@@ -26,25 +17,23 @@ interface PageProps {
 export default function ProjectPage({ params }: PageProps) {
     const projectName = params.name;
 
-    // Find the repository
-    const repo = mockRepositories.find(r => r.name === projectName);
+    // For Phase 2, we want to allow ANY repo name to load the project page.
+    // Eventually we will fetch the real repo details here.
+    // For now, we mock the repo object based on the name so the UI renders.
 
-    if (!repo) {
-        return (
-            <div className="relative min-h-screen pb-24 md:pb-8">
-                <Navigation />
-                <main className="relative z-10 pt-24 md:pt-32 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-4xl mx-auto text-center">
-                        <h1 className="text-3xl font-bold text-textPrimary mb-4">Project Not Found</h1>
-                        <p className="text-textMuted mb-6">The project &quot;{projectName}&quot; doesn&apos;t exist.</p>
-                        <Link href="/dashboard" className="accent-button">
-                            Back to Dashboard
-                        </Link>
-                    </div>
-                </main>
-            </div>
-        );
-    }
+    const mockRepo = {
+        id: 0, // Placeholder ID
+        name: projectName,
+        full_name: `user/${projectName}`,
+        private: false,
+        html_url: `https://github.com/user/${projectName}`,
+        description: "Repository description loading...",
+        language: "TypeScript", // Placeholder
+        updated_at: new Date().toISOString(),
+        default_branch: "main",
+        // Add any other required fields for ProjectContent
+        deployments: [], // Empty deployments initially
+    };
 
-    return <ProjectContent repo={repo} projectName={projectName} />;
+    return <ProjectContent repo={mockRepo as any} projectName={projectName} />;
 }
