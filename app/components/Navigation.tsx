@@ -32,8 +32,7 @@ interface NavLink {
 // ============================================
 
 const navLinks: NavLink[] = [
-    { href: '/', label: 'Home' },
-    { href: '/dashboard', label: 'Deploy' },
+    { href: '/dashboard', label: 'Dashboard' },
     { href: '/docs', label: 'Docs' },
 ];
 
@@ -101,14 +100,6 @@ export default function Navigation() {
                             </li>
                         ))}
                     </ul>
-
-                    {/* CTA Button */}
-                    <Link
-                        href="/dashboard"
-                        className="ml-6 accent-button text-sm py-2 px-4"
-                    >
-                        Get Started
-                    </Link>
                 </div>
             </nav>
 
@@ -132,46 +123,54 @@ export default function Navigation() {
                     />
 
                     {/* Navigation pill */}
-                    <div className="glass-panel px-6 py-4 rounded-full flex items-center gap-6 relative">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`flex flex-col items-center gap-1 transition-all duration-300 ${isActive(link.href)
-                                    ? 'text-textPrimary scale-110'
-                                    : 'text-textMuted'
-                                    }`}
-                            >
-                                {/* Proper SVG icons */}
-                                <span className="w-5 h-5">
-                                    {link.label === 'Home' && (
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                        </svg>
-                                    )}
-                                    {link.label === 'Deploy' && (
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                    )}
-                                    {link.label === 'Docs' && (
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                    )}
-                                </span>
-                                {/* Label */}
-                                <span className="text-xs font-medium">
-                                    {link.label}
-                                </span>
-                                {/* Active indicator dot */}
-                                {isActive(link.href) && (
-                                    <span
-                                        className="absolute -bottom-1 w-1 h-1 rounded-full bg-white"
-                                    />
-                                )}
-                            </Link>
-                        ))}
+                    <div className="glass-panel px-6 py-4 rounded-full flex items-center gap-8 relative">
+                        {/* Home icon for mobile */}
+                        <Link
+                            href="/"
+                            className={`flex flex-col items-center gap-1 transition-all duration-300 ${pathname === '/'
+                                ? 'text-textPrimary'
+                                : 'text-textMuted'
+                                }`}
+                        >
+                            <span className="w-5 h-5">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                </svg>
+                            </span>
+                            <span className="text-xs font-medium">Home</span>
+                        </Link>
+
+                        {/* Dashboard */}
+                        <Link
+                            href="/dashboard"
+                            className={`flex flex-col items-center gap-1 transition-all duration-300 ${pathname.startsWith('/dashboard') || pathname.startsWith('/project')
+                                ? 'text-textPrimary'
+                                : 'text-textMuted'
+                                }`}
+                        >
+                            <span className="w-5 h-5">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                </svg>
+                            </span>
+                            <span className="text-xs font-medium">Dashboard</span>
+                        </Link>
+
+                        {/* Docs */}
+                        <Link
+                            href="/docs"
+                            className={`flex flex-col items-center gap-1 transition-all duration-300 ${pathname.startsWith('/docs')
+                                ? 'text-textPrimary'
+                                : 'text-textMuted'
+                                }`}
+                        >
+                            <span className="w-5 h-5">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </span>
+                            <span className="text-xs font-medium">Docs</span>
+                        </Link>
                     </div>
                 </div>
             </nav>
