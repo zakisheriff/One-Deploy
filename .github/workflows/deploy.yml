@@ -1,0 +1,153 @@
+# One Deploy - GitHub Actions Build & Deploy Workflow
+#
+# This workflow automatically builds and deploys your frontend project
+# to Cloudflare Pages whenever you push to the main branch.
+#
+# Setup Instructions:
+# 1. Go to Cloudflare Dashboard > Pages > Create a project
+# 2. Generate an API Token with "Cloudflare Pages: Edit" permissions
+# 3. Add the following secrets to your GitHub repository:
+#    - CF_API_TOKEN: Your Cloudflare API token
+#    - CF_ACCOUNT_ID: Your Cloudflare account ID
+# 4. Update 'projectName' below to match your Cloudflare Pages project name
+
+name: Build & Deploy to One Deploy
+
+# Trigger on push to main branch
+on:
+  push:
+    branches:
+      - main
+  # Also trigger on pull requests for preview deployments
+  pull_request:
+    branches:
+      - main
+
+# Environment variables for all jobs
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # ============================================
+  # Build Job
+  # ============================================
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history for better caching
+
+      # Step 2: Setup Node.js environment
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm" # Cache npm dependencies
+
+      # Step 3: Install dependencies
+      - name: Install Dependencies
+        run: npm ci # Use ci for faster, deterministic installs
+
+      # Step 4: Run linting (optional but recommended)
+      - name: Lint Code
+        run: npm run lint
+        continue-on-error: true # Don't fail build on lint warnings
+
+      # Step 5: Build the application
+      - name: Build Application
+        run: npm run build
+        env:
+          # Add any build-time environment variables here
+          NEXT_TELEMETRY_DISABLED: 1
+
+      # Step 6: Upload build artifacts
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: out/ # Next.js static export output directory
+          retention-days: 1
+
+  # ============================================
+  # Deploy Job
+  # ============================================
+  deploy:
+    name: Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+    needs: build # Wait for build to complete
+
+    # Only deploy on push to main (not on PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      # Step 1: Download build artifacts
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: out/
+
+      # Step 2: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: your-project-name # Replace with your Cloudflare Pages project name
+          directory: out
+          # Optional: Add custom domain
+          # branch: main
+
+      # Step 3: Output deployment URL
+      - name: Deployment Complete
+        run: |
+          echo "🚀 Deployment successful!"
+          echo "📍 Your site is live at: https://your-project-name.pages.dev"
+          echo "💡 Custom domain: https://your-project-name.onedeploy.dev"
+
+  # ============================================
+  # Preview Deploy Job (for Pull Requests)
+  # ============================================
+  preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    needs: build
+
+    # Only run on pull requests
+    if: github.event_name == 'pull_request'
+
+    steps:
+      # Step 1: Download build artifacts
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: out/
+
+      # Step 2: Deploy preview to Cloudflare Pages
+      - name: Deploy Preview to Cloudflare Pages
+        id: deploy-preview
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: your-project-name # Replace with your project name
+          directory: out
+          branch: ${{ github.head_ref }} # Deploy to branch preview
+
+      # Step 3: Comment preview URL on PR
+      - name: Comment Preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🚀 Preview Deployment Ready!\n\nYour preview is live at: ${{ steps.deploy-preview.outputs.url }}\n\n---\n*Deployed by One Deploy*`
+            })
