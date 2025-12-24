@@ -10,6 +10,7 @@
 
 import type { Metadata, Viewport } from 'next';
 import './styles/globals.css';
+import { Providers } from './components/Providers';
 
 // ============================================
 // Metadata Configuration
@@ -76,7 +77,9 @@ export default function RootLayout({
             <body className="bg-bgBlack text-textPrimary antialiased min-h-screen overflow-x-hidden">
                 {/* Main content wrapper */}
                 <main className="relative min-h-screen">
-                    {children}
+                    <Providers>
+                        {children}
+                    </Providers>
                 </main>
             </body>
         </html>
