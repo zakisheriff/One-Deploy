@@ -2,7 +2,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
-import { createProject, triggerDeployment } from "../../../../lib/vercel";
+import { createProject, triggerDeployment, addCustomDomain } from "../../../../lib/vercel";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -58,12 +58,18 @@ export async function POST(request: Request) {
         // We need the numeric repoId for gitSource
         const deploymentData = await triggerDeployment(project.name, repoId);
 
-        // 3. Save Deployment to DB
+        // 3. Add custom domain (e.g., projectname.theoneatom.com)
+        const customDomain = await addCustomDomain(project.name);
+        const finalUrl = customDomain
+            ? `https://${customDomain}`
+            : deploymentData.url;
+
+        // 4. Save Deployment to DB
         const deployment = await prisma.deployment.create({
             data: {
                 vercelId: deploymentData.id,
                 status: deploymentData.id ? "QUEUED" : "ERROR",
-                url: deploymentData.url,
+                url: finalUrl,
                 projectId: project.id,
             }
         });
@@ -71,7 +77,8 @@ export async function POST(request: Request) {
         return NextResponse.json({
             success: true,
             deploymentId: deployment.id,
-            vercelDeploymentId: deploymentData.id
+            vercelDeploymentId: deploymentData.id,
+            customDomain: customDomain
         });
 
     } catch (error: any) {

@@ -2,6 +2,54 @@
 const VERCEL_API_URL = "https://api.vercel.com";
 
 /**
+ * Get custom domain base from env (e.g., "theoneatom.com")
+ * Deployed sites will be accessible at: projectname.theoneatom.com
+ */
+const CUSTOM_DOMAIN_BASE = process.env.CUSTOM_DOMAIN_BASE || "";
+
+/**
+ * Add custom subdomain to a Vercel project
+ * e.g., projectname.theoneatom.com
+ */
+export async function addCustomDomain(projectName: string): Promise<string | null> {
+    if (!CUSTOM_DOMAIN_BASE) {
+        console.log("No CUSTOM_DOMAIN_BASE set, skipping custom domain");
+        return null;
+    }
+
+    const customDomain = `${projectName}.${CUSTOM_DOMAIN_BASE}`;
+    console.log(`Adding custom domain: ${customDomain} to project: ${projectName}`);
+
+    try {
+        const res = await fetch(`${VERCEL_API_URL}/v10/projects/${projectName}/domains`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${process.env.VERCEL_API_TOKEN}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ name: customDomain }),
+        });
+
+        if (!res.ok) {
+            const error = await res.json();
+            // Domain might already exist, that's fine
+            if (error.error?.code === 'domain_already_exists' || error.error?.code === 'domain_already_in_use') {
+                console.log(`Domain ${customDomain} already exists`);
+                return customDomain;
+            }
+            console.error("Error adding custom domain:", error);
+            return null;
+        }
+
+        console.log(`Custom domain added: ${customDomain}`);
+        return customDomain;
+    } catch (error) {
+        console.error("Error adding custom domain:", error);
+        return null;
+    }
+}
+
+/**
  * Creates a new project in Vercel.
  * Idempotent: If it exists, it might return error or success depending on API, 
  * but for this logic we primarily depend on the deployment step.
