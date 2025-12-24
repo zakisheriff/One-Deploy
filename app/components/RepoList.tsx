@@ -86,9 +86,9 @@ export default function RepoList({ repositories }: RepoListProps) {
                         href={`/project/${repo.name}`}
                         className="flex items-center gap-4 flex-1 min-w-0 group cursor-pointer"
                     >
-                        {/* Folder icon */}
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-accent-purple/20 to-accent-blue/20 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-white/20 transition-colors">
-                            <svg className="w-6 h-6 text-accent-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        {/* Folder icon - black/white only */}
+                        <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-white/20 transition-colors">
+                            <svg className="w-6 h-6 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                             </svg>
                         </div>
@@ -162,10 +162,10 @@ export default function RepoList({ repositories }: RepoListProps) {
                         {/* View Project Arrow */}
                         <Link
                             href={`/project/${repo.name}`}
-                            className="p-2.5 rounded-lg bg-accent-purple/20 hover:bg-accent-purple/30 border border-accent-purple/30 transition-colors duration-300"
+                            className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/10 transition-colors duration-300"
                             title="View Project"
                         >
-                            <svg className="w-5 h-5 text-accent-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="w-5 h-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>
                         </Link>
