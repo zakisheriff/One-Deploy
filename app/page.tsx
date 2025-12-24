@@ -42,65 +42,17 @@ export default function HomePage() {
             {/* ================================================
           Deployments Showcase Section
           ================================================ */}
+            {/* ================================================
+          Deployments Showcase Section - HIDDEN UNTIL PHASE 3
+          ================================================ */}
+            {/* 
             <section
                 className="relative py-20 px-4 sm:px-6 lg:px-8"
                 aria-labelledby="deployments-heading"
             >
-                {/* Background orbs for this section */}
-                <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                    <AmbientOrb
-                        color="purple"
-                        size={400}
-                        position={{ top: '20%', left: '5%' }}
-                        opacity={0.3}
-                    />
-                    <AmbientOrb
-                        color="blue"
-                        size={350}
-                        position={{ top: '70%', left: '90%' }}
-                        opacity={0.25}
-                    />
-                </div>
-
-                {/* Content container */}
-                <div className="relative z-10 max-w-7xl mx-auto">
-                    {/* Section header */}
-                    <div className="text-center mb-12">
-                        <h2
-                            id="deployments-heading"
-                            className="text-3xl md:text-4xl font-bold text-textPrimary mb-4"
-                        >
-                            Recent Deployments
-                        </h2>
-                        <p className="text-lg text-textMuted max-w-2xl mx-auto">
-                            See what developers are building and deploying on One Deploy.
-                            Every project gets instant hosting with global CDN.
-                        </p>
-                    </div>
-
-                    {/* Deployment cards grid */}
-                    <div className="card-grid">
-                        {mockDeployments.map((deployment, index) => (
-                            <div key={deployment.id}>
-                                <Card deployment={deployment} />
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* CTA to view all */}
-                    <div className="text-center mt-12">
-                        <a
-                            href="/dashboard"
-                            className="inline-flex items-center gap-2 text-white hover:text-textSecondary transition-colors duration-300 font-medium"
-                        >
-                            <span>View all your deployments</span>
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-            </section>
+               ... (hidden)
+            </section> 
+            */}
 
             {/* ================================================
           Features Section
