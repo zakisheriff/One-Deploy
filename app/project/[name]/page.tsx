@@ -27,6 +27,13 @@ import {
     getStatusColor,
 } from '../../lib/mockData';
 
+// Generate static params for all projects
+export function generateStaticParams() {
+    return mockRepositories.map((repo) => ({
+        name: repo.name,
+    }));
+}
+
 // Tab types
 type TabType = 'overview' | 'deployments' | 'settings';
 
@@ -166,8 +173,8 @@ export default function ProjectPage() {
                                     key={tab}
                                     onClick={() => setActiveTab(tab)}
                                     className={`pb-3 text-sm font-medium capitalize border-b-2 transition-colors ${activeTab === tab
-                                            ? 'border-white text-textPrimary'
-                                            : 'border-transparent text-textMuted hover:text-textSecondary'
+                                        ? 'border-white text-textPrimary'
+                                        : 'border-transparent text-textMuted hover:text-textSecondary'
                                         }`}
                                 >
                                     {tab}
