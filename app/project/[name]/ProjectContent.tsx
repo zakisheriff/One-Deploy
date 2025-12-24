@@ -304,7 +304,7 @@ export default function ProjectContent({
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             {/* Project name with icon */}
                             <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-accent-purple/20 to-accent-blue/20 border border-white/10 flex items-center justify-center">
+                                <div className="w-14 h-14 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center">
                                     <svg className="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                                     </svg>

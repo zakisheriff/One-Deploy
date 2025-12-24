@@ -13,7 +13,7 @@ export default function Loading() {
             {/* Animated Logo */}
             <div className="relative">
                 {/* Glow ring */}
-                <div className="absolute inset-0 w-20 h-20 rounded-full bg-gradient-to-r from-accent-purple to-accent-blue blur-xl opacity-50 animate-pulse" />
+                <div className="absolute inset-0 w-20 h-20 rounded-full bg-white/20 blur-xl opacity-50 animate-pulse" />
 
                 {/* Logo circle */}
                 <div className="relative w-20 h-20 rounded-full bg-white flex items-center justify-center animate-pulse">

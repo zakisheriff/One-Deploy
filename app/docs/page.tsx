@@ -53,7 +53,7 @@ export default function DocsPage() {
                     {/* Quick start section */}
                     <section className="glass-panel p-8 mb-8">
                         <h2 className="text-2xl font-bold text-textPrimary mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-purple to-accent-blue flex items-center justify-center text-sm">
+                            <span className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">
                                 1
                             </span>
                             Quick Start
@@ -86,7 +86,7 @@ export default function DocsPage() {
                                 </h3>
                                 <p className="text-textMuted">
                                     Click &quot;Deploy Now&quot; and watch the magic happen. Your site will be live
-                                    at <code className="px-2 py-1 rounded bg-glass-light text-accent-purple">your-repo.onedeploy.dev</code> in seconds.
+                                    at <code className="px-2 py-1 rounded bg-glass-light text-white">your-repo.onedeploy.dev</code> in seconds.
                                 </p>
                             </div>
                         </div>
@@ -95,7 +95,7 @@ export default function DocsPage() {
                     {/* Configuration section */}
                     <section className="glass-panel p-8 mb-8">
                         <h2 className="text-2xl font-bold text-textPrimary mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-blue to-accent-cyan flex items-center justify-center text-sm">
+                            <span className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">
                                 2
                             </span>
                             Configuration
@@ -135,7 +135,7 @@ export default function DocsPage() {
                     {/* Auto-deploy section */}
                     <section className="glass-panel p-8 mb-8">
                         <h2 className="text-2xl font-bold text-textPrimary mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-pink to-accent-purple flex items-center justify-center text-sm">
+                            <span className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">
                                 3
                             </span>
                             Auto-Deploy on Push
@@ -188,7 +188,7 @@ export default function DocsPage() {
                     {/* Custom domains section */}
                     <section className="glass-panel p-8">
                         <h2 className="text-2xl font-bold text-textPrimary mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center text-sm">
+                            <span className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">
                                 4
                             </span>
                             Custom Domains
@@ -212,7 +212,7 @@ export default function DocsPage() {
                                     <tr>
                                         <td className="py-1">CNAME</td>
                                         <td className="py-1">www</td>
-                                        <td className="py-1 text-accent-purple">your-project.onedeploy.dev</td>
+                                        <td className="py-1 text-white">your-project.onedeploy.dev</td>
                                     </tr>
                                 </tbody>
                             </table>

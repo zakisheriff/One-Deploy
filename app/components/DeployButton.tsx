@@ -168,11 +168,11 @@ export default function DeployButton({
 
         switch (deployState) {
             case 'deploying':
-                return `${baseClasses} bg-gradient-to-r from-accent-purple to-accent-blue text-white opacity-80 cursor-wait`;
+                return `${baseClasses} bg-white/80 text-black opacity-80 cursor-wait`;
             case 'success':
-                return `${baseClasses} bg-gradient-to-r from-green-500 to-emerald-500 text-white`;
+                return `${baseClasses} bg-white text-black`;
             case 'error':
-                return `${baseClasses} bg-gradient-to-r from-red-500 to-rose-500 text-white`;
+                return `${baseClasses} bg-gray-500 text-white`;
             default:
                 return `${baseClasses} accent-button hover:scale-[1.02] active:scale-[0.98]`;
         }

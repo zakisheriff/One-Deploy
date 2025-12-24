@@ -133,7 +133,7 @@ export default function Navigation() {
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <div className="w-full h-full bg-accent-purple flex items-center justify-center text-white font-bold text-sm">
+                                    <div className="w-full h-full bg-white flex items-center justify-center text-black font-bold text-sm">
                                         {user.name?.charAt(0) || 'U'}
                                     </div>
                                 )}

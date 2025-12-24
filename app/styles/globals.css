@@ -35,7 +35,7 @@
 
   /* Custom selection colors */
   ::selection {
-    @apply bg-accent-purple/30 text-textPrimary;
+    @apply bg-white/20 text-white;
   }
 
   /* Scrollbar styling for dark theme */
@@ -211,7 +211,7 @@
 
   /* Text gradient */
   .text-gradient {
-    @apply bg-gradient-to-r from-accent-purple via-accent-pink to-accent-blue bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent;
   }
 
   /* Hide scrollbar but keep functionality */
