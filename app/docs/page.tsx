@@ -132,40 +132,56 @@ export default function DocsPage() {
                         </div>
                     </section>
 
-                    {/* GitHub Actions section */}
+                    {/* Auto-deploy section */}
                     <section className="glass-panel p-8 mb-8">
                         <h2 className="text-2xl font-bold text-textPrimary mb-6 flex items-center gap-3">
                             <span className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-pink to-accent-purple flex items-center justify-center text-sm">
                                 3
                             </span>
-                            GitHub Actions
+                            Auto-Deploy on Push
                         </h2>
 
                         <p className="text-textMuted mb-6">
-                            For automatic deployments on every push, add this workflow to your repository:
+                            Once you&apos;ve deployed a project, One Deploy automatically redeploys
+                            whenever you push to your main branch. No configuration needed!
                         </p>
 
-                        <div className="bg-black/30 rounded-lg p-4 font-mono text-sm text-textSecondary overflow-x-auto">
-                            <pre>{`name: Build & Deploy
-on:
-  push:
-    branches: [main]
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run build
-      - uses: cloudflare/pages-action@v1
-        with:
-          apiToken: \${{ secrets.CF_API_TOKEN }}
-          accountId: \${{ secrets.CF_ACCOUNT_ID }}
-          projectName: your-project
-          directory: ./out`}</pre>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center mt-0.5">
+                                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-textSecondary">Push to GitHub</h3>
+                                    <p className="text-textMuted text-sm">Commit your changes and push to main</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center mt-0.5">
+                                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-textSecondary">Automatic Build</h3>
+                                    <p className="text-textMuted text-sm">We detect the push and trigger a new build</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center mt-0.5">
+                                    <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-textSecondary">Live in Seconds</h3>
+                                    <p className="text-textMuted text-sm">Your site is updated with the latest changes</p>
+                                </div>
+                            </div>
                         </div>
                     </section>
 

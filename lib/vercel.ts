@@ -102,3 +102,41 @@ export async function getDeployment(id: string) {
     });
     return await res.json();
 }
+
+/**
+ * Creates a deployment using repo name (for webhook-triggered deploys)
+ */
+export async function createDeployment(
+    projectName: string,
+    repoFullName: string,
+    branch: string = "main",
+    framework?: string
+) {
+    console.log(`Creating deployment for project: ${projectName}, repo: ${repoFullName}`);
+
+    const res = await fetch(`${VERCEL_API_URL}/v13/deployments?skipAutoDetectionConfirmation=1`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${process.env.VERCEL_API_TOKEN}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            name: projectName,
+            gitSource: {
+                type: "github",
+                repo: repoFullName,
+                ref: branch,
+            },
+            projectSettings: framework ? { framework } : undefined,
+        })
+    });
+
+    if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Deployment failed:", errorData);
+        const errorMessage = errorData.error?.message || errorData.message || "Failed to create deployment";
+        throw new Error(errorMessage);
+    }
+
+    return await res.json();
+}

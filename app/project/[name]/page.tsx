@@ -24,6 +24,8 @@ export default async function ProjectPage({ params }: PageProps) {
         redirect('/');
     }
 
+    const userId = (session.user as any).id;
+
     // Default mock fallback in case of API failure
     let repoData = {
         id: 0,
@@ -38,19 +40,55 @@ export default async function ProjectPage({ params }: PageProps) {
         deployments: [],
     };
 
+    // Fetch existing project and deployments from database
+    let existingProject = null;
+    let existingDeployments: any[] = [];
+
+    try {
+        const project = await prisma.project.findFirst({
+            where: {
+                name: projectName.toLowerCase(),
+                userId: userId,
+            },
+            include: {
+                deployments: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 10,
+                },
+            },
+        });
+
+        if (project) {
+            existingProject = {
+                id: project.id,
+                name: project.name,
+                githubRepo: project.githubRepo,
+                framework: project.framework,
+                createdAt: project.createdAt,
+            };
+            existingDeployments = project.deployments.map(d => ({
+                id: d.id,
+                vercelId: d.vercelId,
+                url: d.url,
+                status: d.status,
+                createdAt: d.createdAt,
+            }));
+        }
+    } catch (error) {
+        console.error("Error fetching existing project:", error);
+    }
+
     try {
         // Get GitHub Token
         const account = await prisma.account.findFirst({
             where: {
-                userId: (session.user as any).id,
+                userId: userId,
                 provider: "github",
             },
         });
 
         if (account?.access_token) {
             // Fetch user's repos to find the specific one
-            // Ideally we'd fetch /repos/{owner}/{repo}, but we need owner login. 
-            // Fetching list is safer for now if we don't know the exact owner (could be org).
             const res = await fetch("https://api.github.com/user/repos?per_page=100&sort=updated", {
                 headers: {
                     Authorization: `Bearer ${account.access_token}`,
@@ -61,20 +99,13 @@ export default async function ProjectPage({ params }: PageProps) {
 
             if (res.ok) {
                 const repos = await res.json();
-                console.log(`[ProjectPage] Fetched ${repos.length} repos from GitHub`);
-
                 const foundRepo = repos.find((r: any) => r.name === projectName || r.name.toLowerCase() === projectName.toLowerCase());
 
                 if (foundRepo) {
-                    console.log(`[ProjectPage] Found match: ${foundRepo.full_name}`);
                     repoData = {
                         ...foundRepo,
-                        deployments: [], // Still empty until we link deployments
+                        deployments: existingDeployments,
                     };
-                } else {
-                    console.log(`[ProjectPage] No match found for: ${projectName}`);
-                    // Debug: print first 3 repo names
-                    if (repos.length > 0) console.log("Sample repos:", repos.slice(0, 3).map((r: any) => r.name));
                 }
             } else {
                 console.error(`[ProjectPage] GitHub API Error: ${res.status}`);
@@ -84,5 +115,13 @@ export default async function ProjectPage({ params }: PageProps) {
         console.error("Error fetching repo details:", error);
     }
 
-    return <ProjectContent repo={repoData as any} projectName={projectName} />;
+    return (
+        <ProjectContent
+            repo={repoData as any}
+            projectName={projectName}
+            initialProject={existingProject}
+            initialDeployments={existingDeployments}
+        />
+    );
 }
+

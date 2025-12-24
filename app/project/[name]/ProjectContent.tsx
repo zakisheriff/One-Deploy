@@ -25,18 +25,47 @@ import {
 // Tab types
 type TabType = 'overview' | 'deployments' | 'settings';
 
+// Deployment type from database
+interface DeploymentData {
+    id: string;
+    vercelId: string | null;
+    url: string | null;
+    status: string;
+    createdAt: Date | string;
+}
+
+// Project type from database
+interface ProjectData {
+    id: string;
+    name: string;
+    githubRepo: string;
+    framework: string | null;
+    createdAt: Date | string;
+}
+
 interface ProjectContentProps {
     repo: Repository;
     projectName: string;
+    initialProject?: ProjectData | null;
+    initialDeployments?: DeploymentData[];
 }
 
-export default function ProjectContent({ repo, projectName }: ProjectContentProps) {
+export default function ProjectContent({
+    repo,
+    projectName,
+    initialProject,
+    initialDeployments = []
+}: ProjectContentProps) {
+    // Get the most recent deployment as the current one
+    const latestDeployment = initialDeployments.length > 0 ? initialDeployments[0] : null;
+
     // State
     const [activeTab, setActiveTab] = useState<TabType>('overview');
     const [isDeploying, setIsDeploying] = useState(false);
     const [logs, setLogs] = useState<DeploymentLog[]>([]);
     const [pollingDeploymentId, setPollingDeploymentId] = useState<string | null>(null);
-    const [deployment, setDeployment] = useState<any | null>(null);
+    const [deployment, setDeployment] = useState<any | null>(latestDeployment);
+    const [deploymentHistory, setDeploymentHistory] = useState<DeploymentData[]>(initialDeployments);
 
     // Polling Effect
     React.useEffect(() => {
@@ -86,10 +115,18 @@ export default function ProjectContent({ repo, projectName }: ProjectContentProp
                         level: 'success'
                     }]);
 
-                    setDeployment({
+                    const newDeployment = {
+                        id: data.id || pollingDeploymentId,
+                        vercelId: pollingDeploymentId,
                         url: `https://${data.url}`,
-                        build_time: Math.round((data.ready - data.createdAt) / 1000) || 'N/A'
-                    });
+                        status: 'READY',
+                        createdAt: new Date().toISOString(),
+                    };
+
+                    setDeployment(newDeployment);
+
+                    // Add to history
+                    setDeploymentHistory(prev => [newDeployment, ...prev]);
 
                     setPollingDeploymentId(null);
                     setIsDeploying(false);
@@ -366,9 +403,64 @@ export default function ProjectContent({ repo, projectName }: ProjectContentProp
                         <div className="space-y-4">
                             <h2 className="text-lg font-semibold text-textPrimary">Deployment History</h2>
 
-                            <div className="glass-panel p-8 text-center">
-                                <p className="text-textMuted">Deployment history coming soon.</p>
-                            </div>
+                            {deploymentHistory.length === 0 ? (
+                                <div className="glass-panel p-8 text-center">
+                                    <svg className="w-12 h-12 mx-auto text-textMuted mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    <p className="text-textMuted">No deployments yet.</p>
+                                    <p className="text-textMuted text-sm mt-1">Deploy your project to see history here.</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {deploymentHistory.map((d, index) => (
+                                        <div
+                                            key={d.id}
+                                            className={`glass-panel p-4 flex flex-col sm:flex-row sm:items-center gap-4 ${index === 0 ? 'border border-white/20' : ''}`}
+                                        >
+                                            {/* Status Badge */}
+                                            <div className="flex items-center gap-3">
+                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${d.status === 'READY'
+                                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                                    : d.status === 'ERROR' || d.status === 'CANCELED'
+                                                        ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                                        : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                                    }`}>
+                                                    {d.status}
+                                                </span>
+                                                {index === 0 && (
+                                                    <span className="text-xs text-textMuted">Latest</span>
+                                                )}
+                                            </div>
+
+                                            {/* Deployment Info */}
+                                            <div className="flex-1">
+                                                <p className="text-sm text-textPrimary font-mono">
+                                                    {d.vercelId || d.id}
+                                                </p>
+                                                <p className="text-xs text-textMuted">
+                                                    {new Date(d.createdAt).toLocaleString()}
+                                                </p>
+                                            </div>
+
+                                            {/* URL Link */}
+                                            {d.url && d.status === 'READY' && (
+                                                <a
+                                                    href={d.url.startsWith('http') ? d.url : `https://${d.url}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-glass-light hover:bg-glass-medium text-sm text-textSecondary hover:text-textPrimary transition-colors"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                    Visit
+                                                </a>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
 
