@@ -15,9 +15,7 @@ import React from 'react';
 import Link from 'next/link';
 import Hero from './components/Hero';
 import Navigation from './components/Navigation';
-import Card from './components/Card';
 import AmbientOrb from './components/AmbientOrb';
-import { mockDeployments } from './lib/mockData';
 
 // ============================================
 // Page Component
