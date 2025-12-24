@@ -206,8 +206,7 @@ MIT License — 100% Free and Open Source
 ---
 
 <p align="center">
-Made with ❤️ by <strong>Zaki Sheriff</strong> at <strong>The One Atom</strong>
-</p>
+Made by <strong>Zaki Sheriff</strong>
 
 <p align="center">
 <em>Deploy in seconds, scale globally.</em>
