@@ -32,61 +32,101 @@ export default function Hero() {
         setMounted(true);
     }, []);
 
-    // Prevent hydration mismatch by rendering a placeholder or loading state initially if needed
-    // However, for the CTA, we just want to ensure we match server content initially if possible.
-    // Better approach: Since we don't know session state on server, and client updates it,
-    // we can defer the specific button rendering or accept the "Connect GitHub" as default.
-    // BUT the error is mismatch. 
-    // If we return "Connect GitHub" on server, and "Connect GitHub" on client (initially undefined session), it's fine.
-    // But if session is already active (cached), it might render "Dashboard" immediately?
-    // Let's safe-guard by only showing the dynamic button after mount.
-
     return (
         <section
             className="relative min-h-screen flex flex-col items-center pt-20 pb-32 md:pt-40 md:pb-0 overflow-hidden px-4"
             aria-label="Hero section"
         >
-            {/* ... existing content ... */}
-
-            {/* (Skipping to the relevant part via strict replacement logic requires matching exact lines)
-                 Wait, I can't just replace the whole function easily with `replace_file_content` if lines are missing.
-                 I will verify the TARGET CONTENT matches existing file.
-             */}
-
-            {/* RE-READING FILE SHOWS:
-            Line 27: export default function Hero() {
-            Line 28:     const { data: session } = useSession();
-            Line 29:     return (
-        */}
-
+            {/* ================================================
+          Background Ambient Orbs
+          ================================================ */}
             <div
                 className="absolute inset-0 overflow-hidden pointer-events-none"
                 aria-hidden="true"
             >
-                {/* ... orbs ... */}
+                {/* Top left purple orb */}
+                <AmbientOrb {...orbPresets.heroTopLeft} />
+
+                {/* Top right blue orb */}
+                <AmbientOrb {...orbPresets.heroTopRight} />
+
+                {/* Center left pink orb */}
+                <AmbientOrb {...orbPresets.heroCenterLeft} />
+
+                {/* Bottom right cyan orb */}
+                <AmbientOrb {...orbPresets.heroBottomRight} />
+
+                {/* Center mixed gradient orb - subtle and large */}
+                <AmbientOrb {...orbPresets.heroCenter} />
+
+                {/* Additional smaller accent orbs */}
+                <AmbientOrb
+                    color="purple"
+                    size={200}
+                    position={{ top: '30%', left: '70%' }}
+                    delay={3000}
+                    opacity={0.3}
+                    animationClass="animate-drift-3"
+                />
+                <AmbientOrb
+                    color="cyan"
+                    size={150}
+                    position={{ top: '80%', left: '20%' }}
+                    delay={1500}
+                    opacity={0.35}
+                    animationClass="animate-drift-2"
+                />
             </div>
 
+            {/* ================================================
+          Hero Content
+          ================================================ */}
             <div className="relative z-10 text-center max-w-5xl mx-auto">
-                {/* ... content ... */}
+                {/* Badge / Tag - visible on all screens */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-glass-light backdrop-blur-glass border border-white/10 mb-6 md:mb-8">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                    <span className="text-textSecondary text-xs font-medium">
+                        Powered by Cloudflare Edge
+                    </span>
+                </div>
+
+                {/* Main Headline */}
+                <h1>
+                    {/* Line 1: "One Deploy" - bigger as requested */}
+                    <span className="block text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tight mb-2 md:mb-4 glow-text">
+                        One Deploy
+                    </span>
+                    {/* Line 2: Descriptive tagline */}
+                    <span className="block text-xl sm:text-2xl md:text-4xl lg:text-5xl font-medium text-textSecondary">
+                        Deploy in{' '}
+                        <span className="text-white font-bold">Seconds</span>
+                    </span>
+                </h1>
+
+                {/* Subheadline / Description */}
+                <p className="mt-4 md:mt-8 text-base md:text-xl text-textMuted max-w-xl md:max-w-2xl mx-auto leading-relaxed px-4">
+                    Push your code. We handle the rest.{' '}
+                    <span className="text-textSecondary">
+                        Automatic builds, global CDN, instant SSL, and custom domains.
+                    </span>
+                </p>
+
+                {/* Keywords / Features Row */}
+                <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mt-6 md:mt-8 px-2">
+                    {['GitHub Integration', 'Zero Config', 'Edge Deployed', 'SSL Included'].map((keyword, index) => (
+                        <span
+                            key={keyword}
+                            className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-glass-light/50 backdrop-blur-sm border border-white/5 text-textSecondary text-xs md:text-sm font-medium subtle-glow"
+                            style={{ animationDelay: `${(index + 3) * 100}ms` }}
+                        >
+                            {keyword}
+                        </span>
+                    ))}
+                </div>
 
                 {/* CTA Buttons - Row on mobile, smaller buttons */}
                 <div className="flex flex-row items-center justify-center gap-3 md:gap-4 mt-6 md:mt-12 px-2">
                     {/* Primary CTA */}
-                    {/* Render nothing until mounted to prevent hydration error, OR render default Link style locally?
-                        Common fix:
-                        {mounted && session ? (...) : (...)} 
-                        This renders FALSE initially on client.
-                        Server renders FALSE (Connect GitHub)?? No.
-                        Server sees `mounted` as false (initial state).
-                        So `{mounted && session ? ... : ...}`
-                        If mounted is false:
-                        It renders the ELSE block ("Connect GitHub").
-                        Server renders "Connect GitHub".
-                        Client initially renders "Connect GitHub".
-                        Then mount -> true -> Client updates to "Dashboard" if session exists.
-                        This is valid and safe.
-                    */}
-
                     {mounted && session ? (
                         <Link
                             href="/dashboard"
