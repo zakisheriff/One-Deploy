@@ -146,7 +146,7 @@ export default function DeploymentLogs({ logs, isDeploying = false }: Deployment
 
                         {/* Level badge */}
                         <span className={`px-1.5 py-0.5 rounded text-xs font-medium uppercase flex-shrink-0 border ${logLevelBadge[log.level]}`}>
-                            {log.level.slice(0, 4)}
+                            {log.level === 'error' ? 'ERR' : log.level.slice(0, 4)}
                         </span>
 
                         {/* Message with clickable links */}

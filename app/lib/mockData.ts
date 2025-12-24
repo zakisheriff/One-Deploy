@@ -199,21 +199,7 @@ export const mockDeployments: Deployment[] = [
  * Simulated build and deployment logs
  * Shows a realistic deployment workflow
  */
-export const mockDeploymentLogs: DeploymentLog[] = [
-    { timestamp: '11:00:01', level: 'info', message: 'Cloning repository...' },
-    { timestamp: '11:00:03', level: 'info', message: 'Repository cloned successfully' },
-    { timestamp: '11:00:04', level: 'info', message: 'Installing dependencies...' },
-    { timestamp: '11:00:15', level: 'info', message: 'Dependencies installed (143 packages)' },
-    { timestamp: '11:00:16', level: 'info', message: 'Running build command: npm run build' },
-    { timestamp: '11:00:25', level: 'success', message: 'Build completed successfully' },
-    { timestamp: '11:00:26', level: 'info', message: 'Uploading static files to CDN...' },
-    { timestamp: '11:00:32', level: 'info', message: 'Uploaded 47 files (2.3 MB)' },
-    { timestamp: '11:00:33', level: 'info', message: 'Configuring SSL certificate...' },
-    { timestamp: '11:00:35', level: 'success', message: 'SSL certificate provisioned' },
-    { timestamp: '11:00:36', level: 'info', message: 'Updating DNS records...' },
-    { timestamp: '11:00:38', level: 'success', message: 'Deployment complete!' },
-    { timestamp: '11:00:38', level: 'success', message: 'Your site is live at: https://portfolio-site.onedeploy.dev' },
-];
+export const mockDeploymentLogs: DeploymentLog[] = [];
 
 // ============================================
 // Mock OAuth State

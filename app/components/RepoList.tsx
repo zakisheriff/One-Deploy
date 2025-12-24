@@ -16,7 +16,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { Repository, formatRelativeTime } from '../lib/mockData';
-import DeployButton from './DeployButton';
 
 // ============================================
 // Types
@@ -25,8 +24,6 @@ import DeployButton from './DeployButton';
 interface RepoListProps {
     /** List of repositories to display */
     repositories: Repository[];
-    /** Optional callback when deployment starts */
-    onDeploy?: (repoName: string) => void;
 }
 
 // ============================================
@@ -52,7 +49,7 @@ const languageColors: Record<string, string> = {
 /**
  * RepoList displays connected GitHub repositories with deploy options
  */
-export default function RepoList({ repositories, onDeploy }: RepoListProps) {
+export default function RepoList({ repositories }: RepoListProps) {
     if (repositories.length === 0) {
         // Empty state
         return (
@@ -162,12 +159,16 @@ export default function RepoList({ repositories, onDeploy }: RepoListProps) {
                             </svg>
                         </a>
 
-                        {/* Deploy button */}
-                        <DeployButton
-                            repoName={repo.name}
-                            onDeploy={onDeploy}
-                            size="sm"
-                        />
+                        {/* View Project Arrow */}
+                        <Link
+                            href={`/project/${repo.name}`}
+                            className="p-2.5 rounded-lg bg-accent-purple/20 hover:bg-accent-purple/30 border border-accent-purple/30 transition-colors duration-300"
+                            title="View Project"
+                        >
+                            <svg className="w-5 h-5 text-accent-purple" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                        </Link>
                     </div>
                 </article>
             ))}

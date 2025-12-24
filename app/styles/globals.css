@@ -116,7 +116,7 @@
 
   /* Navigation link with underline effect */
   .nav-link {
-    @apply text-textSecondary hover:text-textPrimary transition-all duration-300 relative;
+    @apply text-textSecondary hover:text-textPrimary transition-all duration-300 relative pb-1;
   }
 
   .nav-link::after {

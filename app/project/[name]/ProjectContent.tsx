@@ -14,8 +14,8 @@ import DeploymentLogs from '../../components/DeploymentLogs';
 import {
     Repository,
     Deployment,
-    mockDeployments,
-    mockDeploymentLogs,
+    // mockDeployments, // Disabled
+    // mockDeploymentLogs, // Disabled
     DeploymentLog,
     generateDeploymentUrl,
     formatRelativeTime,
@@ -31,32 +31,171 @@ interface ProjectContentProps {
 }
 
 export default function ProjectContent({ repo, projectName }: ProjectContentProps) {
-    const deployment = mockDeployments.find(d => d.repo_name === projectName);
-
     // State
     const [activeTab, setActiveTab] = useState<TabType>('overview');
     const [isDeploying, setIsDeploying] = useState(false);
     const [logs, setLogs] = useState<DeploymentLog[]>([]);
+    const [pollingDeploymentId, setPollingDeploymentId] = useState<string | null>(null);
+    const [deployment, setDeployment] = useState<any | null>(null);
 
-    // Handle redeploy
-    const handleDeploy = () => {
-        setIsDeploying(true);
-        setLogs([]);
-        setActiveTab('overview');
+    // Polling Effect
+    React.useEffect(() => {
+        if (!pollingDeploymentId) return;
 
-        let index = 0;
-        const interval = setInterval(() => {
-            if (index < mockDeploymentLogs.length) {
-                setLogs((prev) => [...prev, mockDeploymentLogs[index]]);
-                index++;
-            } else {
-                clearInterval(interval);
+        const pollInterval = setInterval(async () => {
+            try {
+                const res = await fetch(`/api/deployments/${pollingDeploymentId}`);
+                const data = await res.json();
+
+                if (!res.ok) throw new Error(data.error || 'Failed to fetch status');
+
+                const status = data.readyState; // QUEUED, BUILDING, ERROR, READY, CANCELED
+
+                // Update Logs based on status
+                setLogs(prev => {
+                    // Avoid duplicate logs for same status if possible, or just append progress
+                    const lastLog = prev[prev.length - 1];
+                    if (lastLog && lastLog.message.includes(status)) return prev; // Simple de-dupe
+
+                    if (status === 'BUILDING') {
+                        if (prev.some(l => l.message === 'Building...')) return prev;
+                        return [...prev, {
+                            id: 'building',
+                            timestamp: new Date().toLocaleTimeString(),
+                            message: 'Building...',
+                            type: 'info',
+                            level: 'info'
+                        }];
+                    }
+
+                    return prev;
+                });
+
+                if (status === 'READY') {
+                    setLogs(prev => [...prev, {
+                        id: 'ready',
+                        timestamp: new Date().toLocaleTimeString(),
+                        message: `Deployment Complete!`,
+                        type: 'success',
+                        level: 'success'
+                    }, {
+                        id: 'visit',
+                        timestamp: new Date().toLocaleTimeString(),
+                        message: `Your site is live at: https://${data.url}`,
+                        type: 'success',
+                        level: 'success'
+                    }]);
+
+                    setDeployment({
+                        url: `https://${data.url}`,
+                        build_time: Math.round((data.ready - data.createdAt) / 1000) || 'N/A'
+                    });
+
+                    setPollingDeploymentId(null);
+                    setIsDeploying(false);
+                } else if (status === 'ERROR' || status === 'CANCELED') {
+                    throw new Error(`Deployment ${status.toLowerCase()}`);
+                }
+
+            } catch (error: any) {
+                console.error("Polling Error:", error);
+                setLogs(prev => [...prev, {
+                    id: 'error-poll',
+                    timestamp: new Date().toLocaleTimeString(),
+                    message: `Error: ${error.message}`,
+                    type: 'error',
+                    level: 'error'
+                }]);
+                setPollingDeploymentId(null);
                 setIsDeploying(false);
             }
-        }, 300);
+        }, 3000);
+
+        return () => clearInterval(pollInterval);
+    }, [pollingDeploymentId]);
+
+    // Handle redeploy
+    const handleDeploy = async () => {
+        setIsDeploying(true);
+        setLogs([]);
+        setDeployment(null);
+        setActiveTab('overview');
+
+        // Add initial log
+        setLogs(prev => [...prev, {
+            id: 'init',
+            timestamp: new Date().toLocaleTimeString(),
+            message: `Initiating deployment for ${projectName}...`,
+            type: 'info',
+            level: 'info'
+        }]);
+
+        try {
+            const res = await fetch('/api/projects/deploy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    repoName: repo.name,
+                    repoId: repo.id,
+                    framework: repo.language
+                })
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || 'Deployment failed');
+            }
+
+            const data = await res.json();
+
+            setLogs(prev => [...prev, {
+                id: 'queued',
+                timestamp: new Date().toLocaleTimeString(),
+                message: `Deployment queued! ID: ${data.vercelDeploymentId}`,
+                type: 'success',
+                level: 'success'
+            }]);
+
+            // Start Polling
+            setPollingDeploymentId(data.vercelDeploymentId);
+
+        } catch (error: any) {
+            console.error("Deploy Error:", error);
+            setLogs(prev => [...prev, {
+                id: 'error',
+                timestamp: new Date().toLocaleTimeString(),
+                message: `Error: ${error.message}`,
+                type: 'error',
+                level: 'error'
+            }]);
+            setIsDeploying(false);
+        }
     };
 
     const deploymentUrl = deployment?.url || generateDeploymentUrl(repo.name);
+
+    // Handle delete
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        if (!confirm(`Are you sure you want to delete ${projectName}? This cannot be undone.`)) return;
+
+        setIsDeleting(true);
+        try {
+            const res = await fetch(`/api/projects/${projectName}`, {
+                method: 'DELETE',
+            });
+
+            if (!res.ok) throw new Error('Failed to delete project');
+
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+        } catch (error) {
+            console.error("Delete Error:", error);
+            alert("Failed to delete project. Please try again.");
+            setIsDeleting(false);
+        }
+    };
 
     return (
         <div className="relative min-h-screen pb-24 md:pb-8">
@@ -127,10 +266,14 @@ export default function ProjectContent({ repo, projectName }: ProjectContentProp
                                     disabled={isDeploying}
                                     className="accent-button flex items-center gap-2"
                                 >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    <svg className={`w-4 h-4 ${isDeploying ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        {isDeploying ? (
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        ) : (
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        )}
                                     </svg>
-                                    {isDeploying ? 'Deploying...' : 'Redeploy'}
+                                    {isDeploying ? 'Deploying...' : (deployment ? 'Redeploy' : 'Deploy')}
                                 </button>
                             </div>
                         </div>
@@ -158,42 +301,15 @@ export default function ProjectContent({ repo, projectName }: ProjectContentProp
                     {activeTab === 'overview' && (
                         <div className="space-y-6">
                             {/* Production Deployment */}
-                            <div className="glass-panel p-6">
-                                <h2 className="text-lg font-semibold text-textPrimary mb-4">Production Deployment</h2>
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className={`status-badge ${deployment ? getStatusColor(deployment.status) : 'status-success'}`}>
-                                                {deployment?.status || 'success'}
-                                            </span>
-                                            <span className="text-textMuted text-sm">
-                                                {deployment ? formatRelativeTime(deployment.created_at) : 'Never deployed'}
-                                            </span>
-                                        </div>
-                                        <a
-                                            href={deploymentUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-white hover:text-textSecondary transition-colors flex items-center gap-2"
-                                        >
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                            </svg>
-                                            {deploymentUrl.replace('https://', '')}
-                                        </a>
+                            {/* Production Deployment - Hidden until connected to API */}
+                            {false && (
+                                <div className="glass-panel p-6">
+                                    <h2 className="text-lg font-semibold text-textPrimary mb-4">Production Deployment</h2>
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                        {/* ... content ... */}
                                     </div>
-                                    {deployment && (
-                                        <div className="text-sm text-textMuted">
-                                            <div className="flex items-center gap-2">
-                                                <code className="px-2 py-1 bg-glass-light rounded text-xs">
-                                                    {deployment.commit_sha}
-                                                </code>
-                                                <span>{deployment.commit_message}</span>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
-                            </div>
+                            )}
 
                             {/* Build Logs */}
                             <div>
@@ -249,48 +365,10 @@ export default function ProjectContent({ repo, projectName }: ProjectContentProp
                     {activeTab === 'deployments' && (
                         <div className="space-y-4">
                             <h2 className="text-lg font-semibold text-textPrimary">Deployment History</h2>
-                            {mockDeployments.filter(d => d.repo_name === projectName).length > 0 ? (
-                                mockDeployments
-                                    .filter(d => d.repo_name === projectName)
-                                    .map((deploy) => (
-                                        <div key={deploy.id} className="glass-panel p-5 flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <span className={`status-badge ${getStatusColor(deploy.status)}`}>
-                                                    {deploy.status}
-                                                </span>
-                                                <div>
-                                                    <div className="flex items-center gap-2 text-sm">
-                                                        <code className="px-2 py-0.5 bg-glass-light rounded text-xs text-textSecondary">
-                                                            {deploy.commit_sha}
-                                                        </code>
-                                                        <span className="text-textPrimary">{deploy.commit_message}</span>
-                                                    </div>
-                                                    <p className="text-xs text-textMuted mt-1">
-                                                        {formatRelativeTime(deploy.created_at)}
-                                                        {deploy.build_time > 0 && ` • Built in ${deploy.build_time}s`}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            {deploy.url && (
-                                                <a
-                                                    href={deploy.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-sm text-textMuted hover:text-textPrimary transition-colors flex items-center gap-1"
-                                                >
-                                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                                    </svg>
-                                                    Visit
-                                                </a>
-                                            )}
-                                        </div>
-                                    ))
-                            ) : (
-                                <div className="glass-panel p-8 text-center">
-                                    <p className="text-textMuted">No deployments yet. Click &quot;Redeploy&quot; to start your first deployment.</p>
-                                </div>
-                            )}
+
+                            <div className="glass-panel p-8 text-center">
+                                <p className="text-textMuted">Deployment history coming soon.</p>
+                            </div>
                         </div>
                     )}
 
@@ -342,15 +420,29 @@ export default function ProjectContent({ repo, projectName }: ProjectContentProp
                                 </button>
                             </div>
 
-                            <div className="glass-panel p-6 border border-red-500/30">
-                                <h2 className="text-lg font-semibold text-red-400 mb-4">Danger Zone</h2>
-                                <p className="text-textMuted text-sm mb-4">
-                                    Permanently delete this project and all of its deployments.
-                                </p>
-                                <button className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors">
-                                    Delete Project
-                                </button>
-                            </div>
+                            {/* Danger Zone - Only show if project has been deployed */}
+                            {deployment ? (
+                                <div className="glass-panel p-6 border border-red-500/30">
+                                    <h2 className="text-lg font-semibold text-red-400 mb-4">Danger Zone</h2>
+                                    <p className="text-textMuted text-sm mb-4">
+                                        Permanently delete this project and all of its deployments from Vercel.
+                                    </p>
+                                    <button
+                                        onClick={handleDelete}
+                                        disabled={isDeleting}
+                                        className="px-4 py-2 rounded-lg bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                                    >
+                                        {isDeleting ? 'Deleting...' : 'Delete Project'}
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="glass-panel p-6 border border-white/10">
+                                    <h2 className="text-lg font-semibold text-textMuted mb-2">No Deployment Yet</h2>
+                                    <p className="text-textMuted text-sm">
+                                        Deploy your project first to access project management options.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

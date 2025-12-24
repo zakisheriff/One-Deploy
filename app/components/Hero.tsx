@@ -82,14 +82,6 @@ export default function Hero() {
           Hero Content
           ================================================ */}
             <div className="relative z-10 text-center max-w-5xl mx-auto">
-                {/* Badge / Tag - visible on all screens */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-glass-light backdrop-blur-glass border border-white/10 mb-6 md:mb-8">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                    <span className="text-textSecondary text-xs font-medium">
-                        Powered by Cloudflare Edge
-                    </span>
-                </div>
-
                 {/* Main Headline */}
                 <h1>
                     {/* Line 1: "One Deploy" - bigger as requested */}
@@ -111,26 +103,13 @@ export default function Hero() {
                     </span>
                 </p>
 
-                {/* Keywords / Features Row */}
-                <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mt-6 md:mt-8 px-2">
-                    {['GitHub Integration', 'Zero Config', 'Edge Deployed', 'SSL Included'].map((keyword, index) => (
-                        <span
-                            key={keyword}
-                            className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-glass-light/50 backdrop-blur-sm border border-white/5 text-textSecondary text-xs md:text-sm font-medium subtle-glow"
-                            style={{ animationDelay: `${(index + 3) * 100}ms` }}
-                        >
-                            {keyword}
-                        </span>
-                    ))}
-                </div>
-
-                {/* CTA Buttons - Row on mobile, smaller buttons */}
+                {/* CTA Buttons - Row on mobile, smaller buttons on desktop */}
                 <div className="flex flex-row items-center justify-center gap-3 md:gap-4 mt-6 md:mt-12 px-2">
                     {/* Primary CTA */}
                     {mounted && session ? (
                         <Link
                             href="/dashboard"
-                            className="accent-button w-auto text-sm md:text-lg px-5 py-2.5 md:px-8 md:py-4 flex items-center justify-center gap-2 md:gap-3 group"
+                            className="accent-button w-auto text-sm md:text-base px-5 py-2.5 md:px-6 md:py-3 flex items-center justify-center gap-2 md:gap-3 group"
                         >
                             <span>Go to Dashboard</span>
                             <svg
@@ -144,8 +123,8 @@ export default function Hero() {
                         </Link>
                     ) : (
                         <button
-                            onClick={() => signIn('github')}
-                            className="accent-button w-auto text-sm md:text-lg px-5 py-2.5 md:px-8 md:py-4 flex items-center justify-center gap-2 md:gap-3 group"
+                            onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
+                            className="accent-button w-auto text-sm md:text-base px-5 py-2.5 md:px-6 md:py-3 flex items-center justify-center gap-2 md:gap-3 group"
                         >
                             <span>Connect GitHub</span>
                             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
@@ -157,7 +136,7 @@ export default function Hero() {
                     {/* Secondary CTA */}
                     <Link
                         href="/docs"
-                        className="glass-button w-auto text-sm md:text-lg px-5 py-2.5 md:px-8 md:py-4 flex items-center justify-center gap-2 md:gap-3"
+                        className="glass-button w-auto text-sm md:text-base px-5 py-2.5 md:px-6 md:py-3 flex items-center justify-center gap-2 md:gap-3"
                     >
                         <svg
                             className="w-5 h-5"
@@ -170,11 +149,6 @@ export default function Hero() {
                         <span>Read Docs</span>
                     </Link>
                 </div>
-
-                {/* Trust indicator */}
-                <p className="mt-6 md:mt-12 text-textMuted text-sm">
-                    Trusted by developers worldwide • Deploys in under 30 seconds
-                </p>
             </div>
 
         </section>
