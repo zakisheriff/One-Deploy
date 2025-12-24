@@ -32,6 +32,7 @@ interface NavLink {
 // ============================================
 
 const navLinks: NavLink[] = [
+    { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/docs', label: 'Docs' },
 ];
@@ -66,22 +67,19 @@ export default function Navigation() {
           Desktop Navigation - Top Center
           ================================================ */}
             <nav
-                className="hidden md:flex fixed top-6 left-1/2 -translate-x-1/2 z-50"
+                className="hidden md:flex fixed top-6 left-12 right-12 justify-center z-50"
                 aria-label="Main navigation"
             >
                 <div className="nav-pill">
-                    {/* Logo / Brand */}
+                    {/* Logo / Brand - icon only */}
                     <Link
                         href="/"
-                        className="flex items-center gap-2 mr-4 group"
+                        className="flex items-center mr-4 group"
                     >
                         {/* Logo icon - stylized "O" for One Deploy */}
-                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                            <span className="text-black font-bold text-sm">O</span>
+                        <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                            <span className="text-black font-extrabold text-base">O</span>
                         </div>
-                        <span className="text-textPrimary font-semibold hidden lg:block">
-                            One Deploy
-                        </span>
                     </Link>
 
                     {/* Divider */}
@@ -110,18 +108,8 @@ export default function Navigation() {
                 className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
                 aria-label="Mobile navigation"
             >
-                {/* Outer container with vignette effect */}
+                {/* Outer container */}
                 <div className="relative">
-                    {/* Vignette edges - soft fade effect */}
-                    <div
-                        className="absolute inset-0 rounded-full pointer-events-none"
-                        style={{
-                            background: 'radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.6) 100%)',
-                            transform: 'scale(1.3)',
-                        }}
-                        aria-hidden="true"
-                    />
-
                     {/* Navigation pill */}
                     <div className="glass-panel px-6 py-4 rounded-full flex items-center gap-8 relative">
                         {/* Home icon for mobile */}
@@ -142,7 +130,7 @@ export default function Navigation() {
 
                         {/* Dashboard */}
                         <Link
-                            href="/dashboard"
+                            href="/dashboard/"
                             className={`flex flex-col items-center gap-1 transition-all duration-300 ${pathname.startsWith('/dashboard') || pathname.startsWith('/project')
                                 ? 'text-textPrimary'
                                 : 'text-textMuted'
@@ -158,7 +146,7 @@ export default function Navigation() {
 
                         {/* Docs */}
                         <Link
-                            href="/docs"
+                            href="/docs/"
                             className={`flex flex-col items-center gap-1 transition-all duration-300 ${pathname.startsWith('/docs')
                                 ? 'text-textPrimary'
                                 : 'text-textMuted'

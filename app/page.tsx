@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import Link from 'next/link';
 import Hero from './components/Hero';
 import Navigation from './components/Navigation';
 import Card from './components/Card';
@@ -27,7 +28,7 @@ import { mockDeployments } from './lib/mockData';
  */
 export default function HomePage() {
     return (
-        <div className="relative min-h-screen">
+        <div className="relative min-h-screen pb-32 md:pb-0">
             {/* ================================================
           Navigation
           ================================================ */}
@@ -241,15 +242,15 @@ export default function HomePage() {
 
                         {/* Links */}
                         <nav className="flex items-center gap-6 text-sm text-textMuted">
-                            <a href="/docs" className="hover:text-textPrimary transition-colors">Docs</a>
-                            <a href="/pricing" className="hover:text-textPrimary transition-colors">Pricing</a>
-                            <a href="/blog" className="hover:text-textPrimary transition-colors">Blog</a>
-                            <a href="/support" className="hover:text-textPrimary transition-colors">Support</a>
+                            <Link href="/docs" className="hover:text-textPrimary transition-colors">Docs</Link>
+                            <Link href="/pricing" className="hover:text-textPrimary transition-colors">Pricing</Link>
+                            <Link href="/blog" className="hover:text-textPrimary transition-colors">Blog</Link>
+                            <Link href="/support" className="hover:text-textPrimary transition-colors">Support</Link>
                         </nav>
 
                         {/* Copyright */}
                         <p className="text-xs text-textMuted">
-                            © 2024 The One Atom. All rights reserved.
+                            © 2024 One Deploy. All rights reserved.
                         </p>
                     </div>
                 </div>

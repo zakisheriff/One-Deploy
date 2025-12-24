@@ -324,6 +324,14 @@ export default function ProjectContent({ repo, projectName }: ProjectContentProp
                                         />
                                     </div>
                                 </div>
+                                <div className="mt-6 pt-4 border-t border-white/10">
+                                    <button
+                                        onClick={() => alert('Settings saved successfully!')}
+                                        className="accent-button"
+                                    >
+                                        Save Settings
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="glass-panel p-6">

@@ -26,7 +26,7 @@ import AmbientOrb, { orbPresets } from './AmbientOrb';
 export default function Hero() {
     return (
         <section
-            className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4"
+            className="relative min-h-screen flex flex-col items-center pt-20 pb-32 md:pt-40 md:pb-0 overflow-hidden px-4"
             aria-label="Hero section"
         >
             {/* ================================================
@@ -74,29 +74,29 @@ export default function Hero() {
           Hero Content
           ================================================ */}
             <div className="relative z-10 text-center max-w-5xl mx-auto">
-                {/* Badge / Tag */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-glass-light backdrop-blur-glass border border-white/10 mb-8">
-                    <span className="w-2 h-2 rounded-full bg-white" />
-                    <span className="text-textSecondary text-sm font-medium">
+                {/* Badge / Tag - visible on all screens */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-glass-light backdrop-blur-glass border border-white/10 mb-6 md:mb-8">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                    <span className="text-textSecondary text-xs font-medium">
                         Powered by Cloudflare Edge
                     </span>
                 </div>
 
                 {/* Main Headline */}
                 <h1>
-                    {/* Line 1: "The One Atom" with glow effect */}
-                    <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-4 glow-text">
-                        The One Atom
+                    {/* Line 1: "One Deploy" - bigger as requested */}
+                    <span className="block text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tight mb-2 md:mb-4 glow-text">
+                        One Deploy
                     </span>
                     {/* Line 2: Descriptive tagline */}
-                    <span className="block text-3xl md:text-4xl lg:text-5xl font-medium text-textSecondary">
+                    <span className="block text-xl sm:text-2xl md:text-4xl lg:text-5xl font-medium text-textSecondary">
                         Deploy in{' '}
                         <span className="text-white font-bold">Seconds</span>
                     </span>
                 </h1>
 
                 {/* Subheadline / Description */}
-                <p className="mt-8 text-lg md:text-xl text-textMuted max-w-2xl mx-auto leading-relaxed">
+                <p className="mt-4 md:mt-8 text-base md:text-xl text-textMuted max-w-xl md:max-w-2xl mx-auto leading-relaxed px-4">
                     Push your code. We handle the rest.{' '}
                     <span className="text-textSecondary">
                         Automatic builds, global CDN, instant SSL, and custom domains.
@@ -104,11 +104,11 @@ export default function Hero() {
                 </p>
 
                 {/* Keywords / Features Row */}
-                <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
+                <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 mt-6 md:mt-8 px-2">
                     {['GitHub Integration', 'Zero Config', 'Edge Deployed', 'SSL Included'].map((keyword, index) => (
                         <span
                             key={keyword}
-                            className="px-4 py-2 rounded-lg bg-glass-light/50 backdrop-blur-sm border border-white/5 text-textSecondary text-sm font-medium subtle-glow"
+                            className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-glass-light/50 backdrop-blur-sm border border-white/5 text-textSecondary text-xs md:text-sm font-medium subtle-glow"
                             style={{ animationDelay: `${(index + 3) * 100}ms` }}
                         >
                             {keyword}
@@ -116,16 +116,16 @@ export default function Hero() {
                     ))}
                 </div>
 
-                {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12">
+                {/* CTA Buttons - Row on mobile, smaller buttons */}
+                <div className="flex flex-row items-center justify-center gap-3 md:gap-4 mt-6 md:mt-12 px-2">
                     {/* Primary CTA */}
                     <Link
                         href="/dashboard"
-                        className="accent-button text-lg px-8 py-4 flex items-center gap-3 group"
+                        className="accent-button w-auto text-sm md:text-lg px-5 py-2.5 md:px-8 md:py-4 flex items-center justify-center gap-2 md:gap-3 group"
                     >
                         <span>Start Deploying</span>
                         <svg
-                            className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
+                            className="w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 group-hover:translate-x-1"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -137,7 +137,7 @@ export default function Hero() {
                     {/* Secondary CTA */}
                     <Link
                         href="/docs"
-                        className="glass-button text-lg px-8 py-4 flex items-center gap-3"
+                        className="glass-button w-auto text-sm md:text-lg px-5 py-2.5 md:px-8 md:py-4 flex items-center justify-center gap-2 md:gap-3"
                     >
                         <svg
                             className="w-5 h-5"
@@ -152,27 +152,11 @@ export default function Hero() {
                 </div>
 
                 {/* Trust indicator */}
-                <p className="mt-12 text-textMuted text-sm">
+                <p className="mt-6 md:mt-12 text-textMuted text-sm">
                     Trusted by developers worldwide • Deploys in under 30 seconds
                 </p>
             </div>
 
-            {/* ================================================
-          Scroll Indicator - subtle arrow only
-          ================================================ */}
-            <div
-                className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block"
-                aria-hidden="true"
-            >
-                <svg
-                    className="w-5 h-5 text-textMuted"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-            </div>
         </section>
     );
 }

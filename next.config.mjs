@@ -12,16 +12,7 @@ const nextConfig = {
     // Enable React strict mode for better development practices
     reactStrictMode: true,
 
-    // Configure for static export (deployable to Cloudflare Pages, S3, etc.)
-    output: 'export',
-
-    // Disable image optimization for static export
-    // (Cloudflare Images or external CDN can be used instead)
-    images: {
-        unoptimized: true,
-    },
-
-    // Trailing slashes for better static hosting compatibility
+    // Trailing slashes for better compatibility
     trailingSlash: true,
 };
 
