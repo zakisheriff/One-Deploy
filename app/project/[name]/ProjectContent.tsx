@@ -128,6 +128,20 @@ export default function ProjectContent({
                     // Add to history
                     setDeploymentHistory(prev => [newDeployment, ...prev]);
 
+                    // UPDATE DATABASE with final status
+                    try {
+                        await fetch(`/api/deployments/${pollingDeploymentId}/status`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                status: 'READY',
+                                url: `https://${data.url}`,
+                            }),
+                        });
+                    } catch (e) {
+                        console.error('Failed to update deployment status in DB:', e);
+                    }
+
                     setPollingDeploymentId(null);
                     setIsDeploying(false);
                 } else if (status === 'ERROR' || status === 'CANCELED') {
