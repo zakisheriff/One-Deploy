@@ -53,8 +53,10 @@ export interface Deployment {
 
 /** Deployment log entry */
 export interface DeploymentLog {
+    id?: string;
     timestamp: string;
     level: 'info' | 'success' | 'warning' | 'error';
+    type?: 'info' | 'success' | 'warning' | 'error';
     message: string;
 }
 

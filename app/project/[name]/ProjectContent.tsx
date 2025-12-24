@@ -59,10 +59,28 @@ export default function ProjectContent({
     // Get the most recent deployment as the current one
     const latestDeployment = initialDeployments.length > 0 ? initialDeployments[0] : null;
 
+    // Initialize logs from latest deployment
+    const initialLogs: DeploymentLog[] = latestDeployment ? [
+        {
+            id: 'history-1',
+            timestamp: new Date(latestDeployment.createdAt).toLocaleTimeString(),
+            message: `Previous deployment: ${latestDeployment.status}`,
+            type: latestDeployment.status === 'READY' ? 'success' : 'info',
+            level: latestDeployment.status === 'READY' ? 'success' : 'info'
+        },
+        ...(latestDeployment.url && latestDeployment.status === 'READY' ? [{
+            id: 'history-2',
+            timestamp: new Date(latestDeployment.createdAt).toLocaleTimeString(),
+            message: `Live at: ${latestDeployment.url}`,
+            type: 'success' as const,
+            level: 'success' as const
+        }] : [])
+    ] : [];
+
     // State
     const [activeTab, setActiveTab] = useState<TabType>('overview');
     const [isDeploying, setIsDeploying] = useState(false);
-    const [logs, setLogs] = useState<DeploymentLog[]>([]);
+    const [logs, setLogs] = useState<DeploymentLog[]>(initialLogs);
     const [pollingDeploymentId, setPollingDeploymentId] = useState<string | null>(null);
     const [deployment, setDeployment] = useState<any | null>(latestDeployment);
     const [deploymentHistory, setDeploymentHistory] = useState<DeploymentData[]>(initialDeployments);
@@ -301,17 +319,30 @@ export default function ProjectContent({
 
                             {/* Actions */}
                             <div className="flex items-center gap-3">
-                                <a
-                                    href={deploymentUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="glass-button flex items-center gap-2"
-                                >
-                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                    Visit Site
-                                </a>
+                                {/* Visit Site - Only enabled if deployed and READY */}
+                                {deployment?.url && deployment?.status === 'READY' ? (
+                                    <a
+                                        href={deployment.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="glass-button flex items-center gap-2"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                        Visit Site
+                                    </a>
+                                ) : (
+                                    <span
+                                        className="glass-button flex items-center gap-2 opacity-50 cursor-not-allowed"
+                                        title="Deploy first to visit site"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                        Visit Site
+                                    </span>
+                                )}
                                 <button
                                     onClick={handleDeploy}
                                     disabled={isDeploying}
@@ -524,6 +555,57 @@ export default function ProjectContent({
                                 <button className="glass-button">
                                     + Add Variable
                                 </button>
+                            </div>
+
+                            {/* Custom Domain Section */}
+                            <div className="glass-panel p-6">
+                                <h2 className="text-lg font-semibold text-textPrimary mb-4">Custom Domain</h2>
+                                <p className="text-textMuted text-sm mb-4">
+                                    Add your own domain instead of using vercel.app URLs.
+                                </p>
+
+                                <div className="flex gap-2 mb-4">
+                                    <input
+                                        type="text"
+                                        id="customDomainInput"
+                                        placeholder="e.g., myproject.theoneatom.com"
+                                        className="flex-1 px-4 py-3 rounded-lg bg-glass-light border border-white/10 text-textPrimary focus:outline-none focus:border-white/30"
+                                    />
+                                    <button
+                                        onClick={async () => {
+                                            const input = document.getElementById('customDomainInput') as HTMLInputElement;
+                                            const domain = input?.value?.trim();
+                                            if (!domain) {
+                                                alert('Please enter a domain');
+                                                return;
+                                            }
+                                            try {
+                                                const res = await fetch(`/api/projects/${projectName}/domain`, {
+                                                    method: 'POST',
+                                                    headers: { 'Content-Type': 'application/json' },
+                                                    body: JSON.stringify({ domain }),
+                                                });
+                                                const data = await res.json();
+                                                if (res.ok) {
+                                                    alert(`Domain ${domain} added successfully! Set up your DNS now.`);
+                                                    input.value = '';
+                                                } else {
+                                                    alert(`Error: ${data.error}`);
+                                                }
+                                            } catch (e: any) {
+                                                alert(`Error: ${e.message}`);
+                                            }
+                                        }}
+                                        className="accent-button"
+                                    >
+                                        Add Domain
+                                    </button>
+                                </div>
+
+                                <div className="text-xs text-textMuted bg-white/5 p-3 rounded-lg">
+                                    <p className="font-medium mb-1">DNS Setup Required:</p>
+                                    <p>Add a CNAME record pointing your domain to <code className="text-white">cname.vercel-dns.com</code></p>
+                                </div>
                             </div>
 
                             {/* Danger Zone - Only show if project has been deployed */}
