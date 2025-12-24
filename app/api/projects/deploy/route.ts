@@ -8,8 +8,13 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
     const session = await getServerSession(authOptions);
 
-    if (!session || !session.user || !session.user.id) {
+    if (!session || !session.user) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = (session.user as any).id;
+    if (!userId) {
+        return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
     try {
@@ -22,17 +27,18 @@ export async function POST(request: Request) {
         // Check if project exists for this user
         let project = await prisma.project.findFirst({
             where: {
-                userId: session.user.id,
+                userId: userId,
                 name: projectName,
             }
         });
 
         // If not, create it
         if (!project) {
+            const userName = (session.user as any).name || 'user';
             // Also create in Vercel if newly tracking
             try {
                 // Use sanitized projectName
-                await createProject(projectName, session.user.name + "/" + repoName);
+                await createProject(projectName, userName + "/" + repoName);
             } catch (e) {
                 console.error("Vercel project creation error", e);
                 // Continue? If project exists in Vercel, we can still deploy.
@@ -43,7 +49,7 @@ export async function POST(request: Request) {
                     name: projectName,
                     githubRepo: repoName,
                     framework: framework || "nextjs",
-                    userId: session.user.id,
+                    userId: userId,
                 }
             });
         }
