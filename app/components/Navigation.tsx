@@ -50,6 +50,11 @@ export default function Navigation() {
     // Get current pathname for active link detection
     const pathname = usePathname();
     const { data: session } = useSession();
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
 
     /**
      * Check if a link is currently active
@@ -100,8 +105,8 @@ export default function Navigation() {
                             </li>
                         ))}
 
-                        {/* Logout Link (Only if logged in) */}
-                        {session && (
+                        {/* Logout Link (Only if logged in AND mounted) */}
+                        {mounted && session && (
                             <li>
                                 <button
                                     onClick={() => signOut({ callbackUrl: '/' })}
@@ -163,14 +168,14 @@ export default function Navigation() {
                             Actually, 4 icons fits fine.
                         */}
 
-                        {session ? (
+                        {mounted && session ? (
                             <button
                                 onClick={() => signOut({ callbackUrl: '/' })}
                                 className="flex flex-col items-center gap-1 transition-all duration-300 text-textMuted hover:text-red-400"
                             >
                                 <span className="w-5 h-5">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                     </svg>
                                 </span>
                                 <span className="text-xs font-medium">Log Out</span>
