@@ -17,6 +17,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
 
 // ============================================
 // Types
@@ -48,6 +49,7 @@ const navLinks: NavLink[] = [
 export default function Navigation() {
     // Get current pathname for active link detection
     const pathname = usePathname();
+    const { data: session } = useSession();
 
     /**
      * Check if a link is currently active
@@ -97,6 +99,18 @@ export default function Navigation() {
                                 </Link>
                             </li>
                         ))}
+
+                        {/* Logout Link (Only if logged in) */}
+                        {session && (
+                            <li>
+                                <button
+                                    onClick={() => signOut({ callbackUrl: '/' })}
+                                    className="nav-link text-textSecondary hover:text-red-400 transition-colors"
+                                >
+                                    Log Out
+                                </button>
+                            </li>
+                        )}
                     </ul>
                 </div>
             </nav>
@@ -144,21 +158,40 @@ export default function Navigation() {
                             <span className="text-xs font-medium">Dashboard</span>
                         </Link>
 
-                        {/* Docs */}
-                        <Link
-                            href="/docs/"
-                            className={`flex flex-col items-center gap-1 transition-all duration-300 ${pathname.startsWith('/docs')
-                                ? 'text-textPrimary'
-                                : 'text-textMuted'
-                                }`}
-                        >
-                            <span className="w-5 h-5">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </span>
-                            <span className="text-xs font-medium">Docs</span>
-                        </Link>
+                        {/* Docs or Logout for Mobile? 
+                            Space is limited. Let's keep Docs and maybe add Logout as a 4th icon or replace Docs?
+                            Actually, 4 icons fits fine.
+                        */}
+
+                        {session ? (
+                            <button
+                                onClick={() => signOut({ callbackUrl: '/' })}
+                                className="flex flex-col items-center gap-1 transition-all duration-300 text-textMuted hover:text-red-400"
+                            >
+                                <span className="w-5 h-5">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                    </svg>
+                                </span>
+                                <span className="text-xs font-medium">Log Out</span>
+                            </button>
+                        ) : (
+                            <Link
+                                href="/docs/"
+                                className={`flex flex-col items-center gap-1 transition-all duration-300 ${pathname.startsWith('/docs')
+                                    ? 'text-textPrimary'
+                                    : 'text-textMuted'
+                                    }`}
+                            >
+                                <span className="w-5 h-5">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </span>
+                                <span className="text-xs font-medium">Docs</span>
+                            </Link>
+                        )}
+
                     </div>
                 </div>
             </nav>
